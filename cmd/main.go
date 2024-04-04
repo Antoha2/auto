@@ -2,10 +2,16 @@ package main
 
 import (
 	"auto/internal/config"
+	"auto/internal/repository"
+	"auto/internal/service"
+	transport "auto/internal/transport/http"
+	"auto/pkg/logger"
 	"auto/pkg/logger/sl"
 	"fmt"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
@@ -17,7 +23,21 @@ func main() {
 }
 
 func Run() {
+	cfg := config.MustLoad()
+	slogger := logger.SetupLogger(cfg.Env)
+	dbx := MustInitDb(cfg)
 
+	rep := repository.NewRep(slogger, dbx)
+	serv := service.NewServ(cfg, slogger, rep)
+	trans := transport.NewApi(cfg, slogger, serv)
+
+	go trans.StartHTTP()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+
+	<-quit
+	trans.Stop()
 }
 
 func MustInitDb(cfg *config.Config) *sqlx.DB {
