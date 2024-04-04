@@ -7,10 +7,6 @@ import (
 	"log/slog"
 )
 
-const DefaultPropertyAge = 0
-const DefaultPropertyOffset = 0
-const DefaultPropertyLimit = 100
-
 type Repository interface {
 	GetAuto(ctx context.Context, id int) error
 	GetAutos(ctx context.Context, filter *repository.RepQueryFilter) ([]*repository.RepAuto, error)
