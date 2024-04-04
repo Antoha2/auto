@@ -95,6 +95,7 @@ func (a *apiImpl) getAutosHandler(c *gin.Context) {
 		}
 	}
 	autosQuery := &service.QueryFilter{
+		RegNum: q.Get(REGNUM),
 		Mark:   q.Get(MARK),
 		Model:  q.Get(MODEL),
 		Owner:  q.Get(OWNER),
