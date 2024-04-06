@@ -18,7 +18,7 @@ func NewRep(log *slog.Logger, dbx *sqlx.DB) *Rep {
 	}
 }
 
-type RepAuto struct {
+type RepCar struct {
 	Id     int
 	RegNum string
 	Mark   string

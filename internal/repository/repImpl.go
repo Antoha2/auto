@@ -4,29 +4,29 @@ import (
 	"context"
 )
 
-func (r *Rep) GetAuto(ctx context.Context, id int) (*RepAuto, error) {
-	auto := new(RepAuto)
-	return auto, nil
+func (r *Rep) GetCar(ctx context.Context, id int) (*RepCar, error) {
+	Car := new(RepCar)
+	return Car, nil
 }
 
-func (r *Rep) GetAutos(ctx context.Context, filter *RepQueryFilter) ([]*RepAuto, error) {
+func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, error) {
 
 	return nil, nil
 }
 
-func (r *Rep) AddAuto(ctx context.Context, auto *RepAuto) (*RepAuto, error) {
+func (r *Rep) AddCar(ctx context.Context, Car *RepCar) (*RepCar, error) {
 
-	return auto, nil
+	return Car, nil
 }
 
-func (r *Rep) DeleteAuto(ctx context.Context, id int) (*RepAuto, error) {
+func (r *Rep) DeleteCar(ctx context.Context, id int) (*RepCar, error) {
 
-	auto := new(RepAuto)
+	Car := new(RepCar)
 
-	return auto, nil
+	return Car, nil
 }
 
-func (r *Rep) UpdateAuto(ctx context.Context, auto *RepAuto) (*RepAuto, error) {
+func (r *Rep) UpdateCar(ctx context.Context, Car *RepCar) (*RepCar, error) {
 
-	return auto, nil
+	return Car, nil
 }

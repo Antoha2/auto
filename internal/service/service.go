@@ -8,34 +8,41 @@ import (
 )
 
 type Repository interface {
-	GetAuto(ctx context.Context, id int) error
-	GetAutos(ctx context.Context, filter *repository.RepQueryFilter) ([]*repository.RepAuto, error)
-	AddAuto(ctx context.Context, auto *repository.RepAuto) (int, error)
-	DeleteAuto(ctx context.Context, id int) (*repository.RepAuto, error)
-	UpdateAuto(ctx context.Context, auto *repository.RepAuto) (*repository.RepAuto, error)
+	GetCar(ctx context.Context, id int) error
+	GetCars(ctx context.Context, filter *repository.RepQueryFilter) ([]*repository.RepCar, error)
+	AddCar(ctx context.Context, Car *repository.RepCar) (int, error)
+	DeleteCar(ctx context.Context, id int) (*repository.RepCar, error)
+	UpdateCar(ctx context.Context, Car *repository.RepCar) (*repository.RepCar, error)
+}
+
+type CarInfoProvider interface {
+	GetCarInfo(ctx context.Context, regNums []string) (*Car, error)
 }
 
 type servImpl struct {
-	cfg *config.Config
-	log *slog.Logger
-	rep *repository.Rep
+	cfg           *config.Config
+	log           *slog.Logger
+	rep           *repository.Rep
+	carInfoClient CarInfoProvider
 }
 
 func NewServ(
 	cfg *config.Config,
 	log *slog.Logger,
 	rep *repository.Rep,
+	carsInfoClient CarInfoProvider,
 ) *servImpl {
 	return &servImpl{
-		rep: rep,
-		log: log,
-		cfg: cfg,
+		rep:           rep,
+		log:           log,
+		cfg:           cfg,
+		carInfoClient: carsInfoClient,
 	}
 }
 
-type Auto struct {
+type Car struct {
 	Id     int    `json:"id"`
-	RegNum string `json:"regNum"`
+	RegNum string `json:"regnum"`
 	Mark   string `json:"mark"`
 	Model  string `json:"model"`
 	Owner  string `json:"owner"`
@@ -49,4 +56,8 @@ type QueryFilter struct {
 	Owner  string `json:"owner"`
 	Offset int    `json:"offset"`
 	Limit  int    `json:"limit"`
+}
+
+type RegNums struct {
+	Nums []string `json:"regNums"`
 }

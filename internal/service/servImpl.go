@@ -3,11 +3,12 @@ package service
 import (
 	"auto/internal/repository"
 	"context"
+	"log"
 
 	"github.com/pkg/errors"
 )
 
-func (s *servImpl) GetAutos(ctx context.Context, filter *QueryFilter) ([]*Auto, error) {
+func (s *servImpl) GetCars(ctx context.Context, filter *QueryFilter) ([]*Car, error) {
 
 	readFilter := &repository.RepQueryFilter{
 		Id:     filter.Id,
@@ -18,98 +19,109 @@ func (s *servImpl) GetAutos(ctx context.Context, filter *QueryFilter) ([]*Auto, 
 		Limit:  filter.Limit,
 		Offset: filter.Offset,
 	}
-	repAutos, err := s.rep.GetAutos(ctx, readFilter)
+	repCars, err := s.rep.GetCars(ctx, readFilter)
 	if err != nil {
-		return nil, errors.Wrap(err, "occurred error GetAutos")
+		return nil, errors.Wrap(err, "occurred error GetCars")
 	}
 
-	autos := make([]*Auto, len(repAutos))
-	for index, auto := range repAutos {
-		t := &Auto{
-			Id:     auto.Id,
-			RegNum: auto.RegNum,
-			Mark:   auto.Mark,
-			Model:  auto.Model,
-			Owner:  auto.Owner,
+	Cars := make([]*Car, len(repCars))
+	for index, car := range repCars {
+		t := &Car{
+			Id:     car.Id,
+			RegNum: car.RegNum,
+			Mark:   car.Mark,
+			Model:  car.Model,
+			Owner:  car.Owner,
 		}
-		autos[index] = t
+		Cars[index] = t
 	}
-	return autos, nil
+	return Cars, nil
 }
 
-func (s *servImpl) GetAuto(ctx context.Context, id int) (*Auto, error) {
-	repAuto, err := s.rep.GetAuto(ctx, id)
+func (s *servImpl) GetCar(ctx context.Context, id int) (*Car, error) {
+	repCar, err := s.rep.GetCar(ctx, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "occurred error GetAuto")
+		return nil, errors.Wrap(err, "occurred error GetCar")
 	}
-	auto := &Auto{
-		Id:     repAuto.Id,
-		RegNum: repAuto.RegNum,
-		Mark:   repAuto.Mark,
-		Model:  repAuto.Model,
-		Owner:  repAuto.Owner,
+	Car := &Car{
+		Id:     repCar.Id,
+		RegNum: repCar.RegNum,
+		Mark:   repCar.Mark,
+		Model:  repCar.Model,
+		Owner:  repCar.Owner,
 	}
-	return auto, nil
+	return Car, nil
 }
 
-func (s *servImpl) DeleteAuto(ctx context.Context, id int) (*Auto, error) {
-	repAuto, err := s.rep.DeleteAuto(ctx, id)
+func (s *servImpl) DeleteCar(ctx context.Context, id int) (*Car, error) {
+	repCar, err := s.rep.DeleteCar(ctx, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "occurred error DeleteAuto")
+		return nil, errors.Wrap(err, "occurred error DeleteCar")
 	}
-	auto := &Auto{
-		Id:     repAuto.Id,
-		RegNum: repAuto.RegNum,
-		Mark:   repAuto.Mark,
-		Model:  repAuto.Model,
-		Owner:  repAuto.Owner,
+	car := &Car{
+		Id:     repCar.Id,
+		RegNum: repCar.RegNum,
+		Mark:   repCar.Mark,
+		Model:  repCar.Model,
+		Owner:  repCar.Owner,
 	}
-	return auto, nil
+	return car, nil
 }
 
-func (s *servImpl) AddAuto(ctx context.Context, auto *Auto) (*Auto, error) {
+func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) (*Car, error) {
 
-	repAuto := &repository.RepAuto{
-		RegNum: auto.RegNum,
-		Mark:   auto.Mark,
-		Model:  auto.Model,
-		Owner:  auto.Owner,
-	}
-
-	repAuto, err := s.rep.AddAuto(ctx, repAuto)
+	repCar := &Car{}
+	log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", nums.Nums)
+	repCar, err := s.carInfoClient.GetCarInfo(ctx, nums.Nums)
 	if err != nil {
-		return nil, errors.Wrap(err, "occurred error AddAuto")
+		return nil, errors.Wrap(err, "occurred error AddCar")
 	}
 
-	respAuto := &Auto{
-		Id:     repAuto.Id,
-		RegNum: repAuto.RegNum,
-		Mark:   repAuto.Mark,
-		Model:  repAuto.Model,
-		Owner:  repAuto.Owner,
-	}
-	return respAuto, nil
+	//
+
+	//log.Println(repCar)
+
+	// 	{
+	// 		RegNum: Car.RegNum,
+	// 		Mark:   Car.Mark,
+	// 		Model:  Car.Model,
+	// 		Owner:  Car.Owner,
+	// 	}
+
+	// 	repCar, err := s.rep.AddCar(ctx, repCar)
+	// 	if err != nil {
+	// 		return nil, errors.Wrap(err, "occurred error AddCar")
+	// 	}
+
+	// 	respCar := &Car{
+	// 		Id:     repCar.Id,
+	// 		RegNum: repCar.RegNum,
+	// 		Mark:   repCar.Mark,
+	// 		Model:  repCar.Model,
+	// 		Owner:  repCar.Owner,
+	// 	}
+	return repCar, nil
 }
 
-func (s *servImpl) UpdateAuto(ctx context.Context, auto *Auto) (*Auto, error) {
+func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {
 
-	reposAuto := &repository.RepAuto{
-		Id:     auto.Id,
-		RegNum: auto.RegNum,
-		Mark:   auto.Mark,
-		Model:  auto.Model,
-		Owner:  auto.Owner,
+	reposCar := &repository.RepCar{
+		Id:     car.Id,
+		RegNum: car.RegNum,
+		Mark:   car.Mark,
+		Model:  car.Model,
+		Owner:  car.Owner,
 	}
-	reposAuto, err := s.rep.UpdateAuto(ctx, reposAuto)
+	reposCar, err := s.rep.UpdateCar(ctx, reposCar)
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error UpdateUser")
 	}
-	respAuto := &Auto{
-		Id:     reposAuto.Id,
-		RegNum: reposAuto.RegNum,
-		Mark:   reposAuto.Mark,
-		Model:  reposAuto.Model,
-		Owner:  reposAuto.Owner,
+	respCar := &Car{
+		Id:     reposCar.Id,
+		RegNum: reposCar.RegNum,
+		Mark:   reposCar.Mark,
+		Model:  reposCar.Model,
+		Owner:  reposCar.Owner,
 	}
-	return respAuto, nil
+	return respCar, nil
 }

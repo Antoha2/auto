@@ -16,11 +16,13 @@ import (
 
 func (a *apiImpl) StartHTTP() error {
 	router := gin.Default()
-	router.GET("/auto/:id", a.getAutoHandler)    //get Auto
-	router.GET("/auto/", a.getAutosHandler)      //get auto
-	router.POST("/auto/", a.addAutoHandler)      //add Auto
-	router.DELETE("/auto/:id", a.delAutoHandler) //del Auto
-	router.PUT("/auto/:id", a.updateAutoHandler) //update Auto
+	router.GET("/CarInfo/:id", a.getCarHandler)    //get Car
+	router.GET("/CarInfo/", a.getCarsHandler)      //get Car
+	router.POST("/CarInfo/", a.addCarHandler)      //add Car
+	router.DELETE("/CarInfo/:id", a.delCarHandler) //del Car
+	router.PUT("/CarInfo/:id", a.updateCarHandler) //update Car
+
+	router.GET("/CarInfo/GetCarInfo", a.getCarInfoHandler) //get CarInfo
 
 	err := router.Run(fmt.Sprintf(":%s", a.cfg.HTTP.HostPort))
 	if err != nil {
@@ -35,10 +37,10 @@ func (a *apiImpl) Stop() {
 	}
 }
 
-// get Auto
-func (a *apiImpl) getAutoHandler(c *gin.Context) {
+// get Car
+func (a *apiImpl) getCarHandler(c *gin.Context) {
 
-	const op = "getAuto"
+	const op = "getCar"
 	log := a.log.With(slog.String("op", op))
 
 	id, err := strconv.Atoi(c.Param(ID))
@@ -48,24 +50,24 @@ func (a *apiImpl) getAutoHandler(c *gin.Context) {
 		return
 	}
 
-	log.Info("run get Auto by ID", sl.Atr("id", id))
+	log.Info("run get Car by ID", sl.Atr("id", id))
 
-	auto, err := a.service.GetAuto(c, id)
+	Car, err := a.service.GetCar(c, id)
 	if err != nil {
-		a.log.Error("occurred error for GetAuto", sl.Err(err))
+		a.log.Error("occurred error for GetCar", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("get User successfully", sl.Atr("respAuto", auto))
+	log.Info("get User successfully", sl.Atr("respCar", Car))
 
-	c.JSON(http.StatusOK, auto)
+	c.JSON(http.StatusOK, Car)
 }
 
-// get Autos
-func (a *apiImpl) getAutosHandler(c *gin.Context) {
+// get Cars
+func (a *apiImpl) getCarsHandler(c *gin.Context) {
 
-	const op = "getAutos"
+	const op = "getCars"
 	log := a.log.With(slog.String("op", op))
 
 	var err error
@@ -94,7 +96,7 @@ func (a *apiImpl) getAutosHandler(c *gin.Context) {
 			return
 		}
 	}
-	autosQuery := &service.QueryFilter{
+	CarsQuery := &service.QueryFilter{
 		RegNum: q.Get(REGNUM),
 		Mark:   q.Get(MARK),
 		Model:  q.Get(MODEL),
@@ -102,51 +104,54 @@ func (a *apiImpl) getAutosHandler(c *gin.Context) {
 		Offset: offset,
 		Limit:  limit,
 	}
-	log.Info("run get Autos", sl.Atr("filter", autosQuery))
+	log.Info("run get Cars", sl.Atr("filter", CarsQuery))
 
-	autos, err := a.service.GetAutos(c, autosQuery)
+	Cars, err := a.service.GetCars(c, CarsQuery)
 	if err != nil {
-		a.log.Error("occurred error Get Autos", sl.Err(err))
+		a.log.Error("occurred error Get Cars", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("get Autos successfully", sl.Atr("respAutos", autos))
+	log.Info("get Cars successfully", sl.Atr("respCars", Cars))
 
-	c.JSON(http.StatusOK, autos)
+	c.JSON(http.StatusOK, Cars)
 }
 
 // add
-func (a *apiImpl) addAutoHandler(c *gin.Context) {
+func (a *apiImpl) addCarHandler(c *gin.Context) {
 
-	const op = "addAutos"
+	const op = "addCars"
 	log := a.log.With(slog.String("op", op))
 
-	auto := &service.Auto{}
-	if err := c.BindJSON(&auto); err != nil {
+	nums := &service.RegNums{}
+	if err := c.BindJSON(&nums); err != nil {
 		log.Error("cant unmarshall", sl.Err(err))
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	log.Info("run add User", sl.Atr("Auto", auto))
+	///////////// CarInfo
 
-	respAuto, err := a.service.AddAuto(c, auto)
+	log.Info("run add Cars", sl.Atr("RegNums", nums))
+
+	respCar, err := a.service.AddCar(c, nums)
+
 	if err != nil {
-		a.log.Error("occurred error for run add Auto", sl.Err(err))
+		a.log.Error("occurred error for run add Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("add Auto successfully", sl.Atr("respAuto", respAuto))
+	log.Info("add Car successfully", sl.Atr("respCar", respCar))
 
-	c.JSON(http.StatusCreated, respAuto)
+	c.JSON(http.StatusCreated, respCar)
 }
 
 // del
-func (a *apiImpl) delAutoHandler(c *gin.Context) {
+func (a *apiImpl) delCarHandler(c *gin.Context) {
 
-	const op = "delAuto"
+	const op = "delCar"
 	log := a.log.With(slog.String("op", op))
 
 	id, err := strconv.Atoi(c.Param(ID))
@@ -156,27 +161,27 @@ func (a *apiImpl) delAutoHandler(c *gin.Context) {
 		return
 	}
 
-	log.Info("run del Auto by ID", sl.Atr("id", id))
+	log.Info("run del Car by ID", sl.Atr("id", id))
 
-	auto, err := a.service.DeleteAuto(c, id)
+	Car, err := a.service.DeleteCar(c, id)
 	if err != nil {
-		a.log.Error("occurred error del Auto", sl.Err(err))
+		a.log.Error("occurred error del Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("del Auto successfully", sl.Atr("respAuto", auto))
+	log.Info("del Car successfully", sl.Atr("respCar", Car))
 
-	c.JSON(http.StatusOK, auto)
+	c.JSON(http.StatusOK, Car)
 }
 
 // update
-func (a *apiImpl) updateAutoHandler(c *gin.Context) {
+func (a *apiImpl) updateCarHandler(c *gin.Context) {
 
-	const op = "updateAuto"
+	const op = "updateCar"
 	log := a.log.With(slog.String("op", op))
 
-	auto := service.Auto{}
+	Car := service.Car{}
 
 	id, err := strconv.Atoi(c.Param(ID))
 	if err != nil {
@@ -185,24 +190,54 @@ func (a *apiImpl) updateAutoHandler(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&auto); err != nil {
-		a.log.Error("cant unmarshall update Auto", sl.Err(err))
+	if err := c.BindJSON(&Car); err != nil {
+		a.log.Error("cant unmarshall update Car", sl.Err(err))
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	auto.Id = id
+	Car.Id = id
 
-	log.Info("run update user", sl.Atr("User", auto))
+	log.Info("run update Car", sl.Atr("User", Car))
 
-	respAuto, err := a.service.UpdateAuto(c, &auto)
+	respCar, err := a.service.UpdateCar(c, &Car)
 	if err != nil {
-		a.log.Error("occurred error update Auto", sl.Err(err))
+		a.log.Error("occurred error update Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("update Auto successfully", sl.Atr("respUser", respAuto))
+	log.Info("update Car successfully", sl.Atr("respCar", respCar))
 
-	c.JSON(http.StatusCreated, respAuto)
+	c.JSON(http.StatusCreated, respCar)
+}
+
+// get CarInfo
+func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
+
+	const op = "getCarInfo"
+	log := a.log.With(slog.String("op", op))
+	nums := &service.RegNums{}
+	if err := c.BindJSON(&nums); err != nil {
+		log.Error("cant unmarshall", sl.Err(err))
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	car := &service.Car{
+		RegNum: "!!!!!!!!!!!!!!!", //nums.Nums[1],
+		Mark:   "mark",
+		Model:  "model",
+		Owner:  "owner",
+	}
+
+	//q := &resp{Id: 1}
+
+	//fmt.Println(" 12123123123 !!!!!!!!!!!!!!!!!!!! ", car)
+
+	c.JSON(http.StatusOK, car)
+}
+
+type resp struct {
+	Id int `json:"id"`
 }

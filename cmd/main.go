@@ -2,6 +2,7 @@ package main
 
 import (
 	"auto/internal/config"
+	provider "auto/internal/providers/carInfo"
 	"auto/internal/repository"
 	"auto/internal/service"
 	transport "auto/internal/transport/http"
@@ -18,6 +19,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+//@title CarInfo API
+//@version 1.0
+//description API server for CarInfo Application
+
+//@host localhost:8000
+//@basepath /
+
 func main() {
 	Run()
 }
@@ -28,7 +36,10 @@ func Run() {
 	dbx := MustInitDb(cfg)
 
 	rep := repository.NewRep(slogger, dbx)
-	serv := service.NewServ(cfg, slogger, rep)
+
+	pGetCarsInfo := provider.NewGetCarInfo(cfg.URLGetCarInfo)
+
+	serv := service.NewServ(cfg, slogger, rep, pGetCarsInfo)
 	trans := transport.NewApi(cfg, slogger, serv)
 
 	go trans.StartHTTP()

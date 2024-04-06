@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	Env      string `env:"ENV" env-default:"local"`
-	HTTP     HTTPConfig
-	DBConfig DBConfig
+	Env           string `env:"ENV" env-default:"local"`
+	HTTP          HTTPConfig
+	DBConfig      DBConfig
+	URLGetCarInfo string `env:"URL_GETCARINFO"`
 }
 
 type DBConfig struct {

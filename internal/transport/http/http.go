@@ -9,11 +9,11 @@ import (
 )
 
 type Service interface {
-	GetAutos(ctx context.Context, filter *service.QueryFilter) ([]*service.Auto, error)
-	GetAuto(ctx context.Context, id int) (*service.Auto, error)
-	DeleteAuto(ctx context.Context, id int) (*service.Auto, error)
-	AddAuto(ctx context.Context, auto *service.Auto) (*service.Auto, error)
-	UpdateAuto(ctx context.Context, auto *service.Auto) (*service.Auto, error)
+	GetCars(ctx context.Context, filter *service.QueryFilter) ([]*service.Car, error)
+	GetCar(ctx context.Context, id int) (*service.Car, error)
+	DeleteCar(ctx context.Context, id int) (*service.Car, error)
+	AddCar(ctx context.Context, car *service.RegNums) (*service.Car, error)
+	UpdateCar(ctx context.Context, car *service.Car) (*service.Car, error)
 }
 
 type apiImpl struct {
