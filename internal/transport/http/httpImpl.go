@@ -23,6 +23,7 @@ func (a *apiImpl) StartHTTP() error {
 	router.PUT("/CarInfo/:id", a.updateCarHandler) //update Car
 
 	router.GET("/CarInfo/GetCarInfo", a.getCarInfoHandler) //get CarInfo
+	router.GET("/CarInfo/test", a.getTestHandler)          //test
 
 	err := router.Run(fmt.Sprintf(":%s", a.cfg.HTTP.HostPort))
 	if err != nil {
@@ -214,7 +215,7 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 
 // get CarInfo
 func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
-	fmt.Println("44444444 ")
+
 	const op = "getCarInfo"
 	log := a.log.With(slog.String("op", op))
 	nums := &service.RegNums{}
@@ -230,14 +231,15 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 	//cars := make(car, len(nums.Nums))
 
 	for i := 0; i < len(nums.Nums); i++ {
-		car.Mark = string(i)
-		car.Model = string(i)
-		car.Owner = string(i)
+		car.Mark = strconv.Itoa(i + 3)
+		car.Model = strconv.Itoa(i * 4)
+		car.Year = i ^ 12
+		car.Owner.Name = strconv.Itoa(i + 3)
+		car.Owner.Surname = strconv.Itoa(i + 3)
+		car.Owner.Patronymic = strconv.Itoa(i + 3)
 		car.RegNum = nums.Nums[i]
 		cars = append(cars, car)
 	}
-
-	fmt.Println("44444444 ")
 
 	// car := &service.Car{
 	// 	RegNum: "!!!!!!!!!!!!!!!", //nums.Nums[1],
@@ -247,4 +249,12 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 	// }
 
 	c.JSON(http.StatusOK, cars)
+}
+
+func (a *apiImpl) getTestHandler(c *gin.Context) {
+
+	// const op = "test"
+	// log := a.log.With(slog.String("op", op))
+
+	c.JSON(http.StatusOK, 0)
 }

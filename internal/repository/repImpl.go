@@ -30,7 +30,7 @@ func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, e
 func (r *Rep) AddCar(ctx context.Context, Cars []*RepCar) ([]RepCar, error) {
 
 	s := buildQueryAddConstrain(Cars)
-	query := fmt.Sprintf("INSERT INTO cars (regnum, mark, model, owners) VALUES %s RETURNING id, regnum, mark, model, owners", s)
+	query := fmt.Sprintf("INSERT INTO cars (regnum, mark, model, year, name, surname, patronymic) VALUES %s RETURNING id, regnum, mark, model, year, name, surname, patronymic", s)
 
 	rows, err := r.DB.QueryContext(ctx, query)
 	if err != nil {
@@ -84,7 +84,7 @@ func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 func buildQueryAddConstrain(cars []*RepCar) string {
 	constrains := make([]string, 0, len(cars))
 	for _, car := range cars {
-		s := fmt.Sprintf("('%s','%s','%s','%s')", car.RegNum, car.Mark, car.Model, car.Owner)
+		s := fmt.Sprintf("('%s','%s','%s','%s')", car.RegNum, car.Mark, car.Model, car.Year)
 		constrains = append(constrains, s)
 	}
 

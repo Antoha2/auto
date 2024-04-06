@@ -3,6 +3,7 @@ package service
 import (
 	"auto/internal/repository"
 	"context"
+	"log"
 
 	"github.com/pkg/errors"
 )
@@ -24,15 +25,26 @@ func (s *servImpl) GetCars(ctx context.Context, filter *QueryFilter) ([]*Car, er
 	}
 
 	Cars := make([]*Car, len(repCars))
-	for index, car := range repCars {
-		t := &Car{
-			Id:     car.Id,
-			RegNum: car.RegNum,
-			Mark:   car.Mark,
-			Model:  car.Model,
-			Owner:  car.Owner,
-		}
-		Cars[index] = t
+	for index, repCar := range repCars {
+
+		car := &Car{}
+
+		car.Id = repCar.Id
+		car.RegNum = repCar.RegNum
+		car.Mark = repCar.Mark
+		car.Model = repCar.Model
+		car.Year = repCar.Year
+		car.Owner.Name = repCar.Name
+		car.Owner.Surname = repCar.Surname
+		car.Owner.Patronymic = repCar.Patronymic
+		// t := &Car{
+		// 	Id:     car.Id,
+		// 	RegNum: car.RegNum,
+		// 	Mark:   car.Mark,
+		// 	Model:  car.Model,
+		// 	Owner:  car.Owner,
+		// }
+		Cars[index] = car
 	}
 	return Cars, nil
 }
@@ -42,14 +54,19 @@ func (s *servImpl) GetCar(ctx context.Context, id int) (*Car, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error GetCar")
 	}
-	Car := &Car{
-		Id:     repCar.Id,
-		RegNum: repCar.RegNum,
-		Mark:   repCar.Mark,
-		Model:  repCar.Model,
-		Owner:  repCar.Owner,
-	}
-	return Car, nil
+
+	car := &Car{}
+
+	car.Id = repCar.Id
+	car.RegNum = repCar.RegNum
+	car.Mark = repCar.Mark
+	car.Model = repCar.Model
+	car.Year = repCar.Year
+	car.Owner.Name = repCar.Name
+	car.Owner.Surname = repCar.Surname
+	car.Owner.Patronymic = repCar.Patronymic
+
+	return car, nil
 }
 
 func (s *servImpl) DeleteCar(ctx context.Context, id int) (*Car, error) {
@@ -57,67 +74,85 @@ func (s *servImpl) DeleteCar(ctx context.Context, id int) (*Car, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error DeleteCar")
 	}
-	car := &Car{
-		Id:     repCar.Id,
-		RegNum: repCar.RegNum,
-		Mark:   repCar.Mark,
-		Model:  repCar.Model,
-		Owner:  repCar.Owner,
-	}
+	car := &Car{}
+
+	car.Id = repCar.Id
+	car.RegNum = repCar.RegNum
+	car.Mark = repCar.Mark
+	car.Model = repCar.Model
+	car.Year = repCar.Year
+	car.Owner.Name = repCar.Name
+	car.Owner.Surname = repCar.Surname
+	car.Owner.Patronymic = repCar.Patronymic
+
 	return car, nil
 }
 
-func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]*Car, error) {
+func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]Car, error) {
 
 	Cars, err := s.carInfoClient.GetCarInfo(ctx, nums.Nums)
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error AddCar")
 	}
 
-	repCars := make([]*repository.RepCar, len(Cars))
+	log.Println("!!!!!!!!!!!!!!", Cars)
+	// repCars := make([]*repository.RepCar, len(Cars))
 
-	for i, car := range Cars {
+	// for i, car := range Cars {
 
-		repCar := &repository.RepCar{
-			Mark:   car.Mark,
-			Model:  car.Model,
-			Owner:  car.Owner,
-			RegNum: car.RegNum,
-		}
-		repCars[i] = repCar
-	}
+	// 	repCar := &repository.RepCar{
+	// 		Mark:   car.Mark,
+	// 		Model:  car.Model,
+	// 		Owner:  car.Owner,
+	// 		RegNum: car.RegNum,
+	// 	}
+	// 	repCars[i] = repCar
+	// }
 
-	respCars, err := s.rep.AddCar(ctx, repCars)
-	if err != nil {
-		return nil, errors.Wrap(err, "occurred error AddCar")
-	}
+	// respCars, err := s.rep.AddCar(ctx, repCars)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "occurred error AddCar")
+	// }
 
-	for i := 0; i < len(Cars); i++ {
-		Cars[i].Id = respCars[i].Id
-	}
-
-	return Cars, nil
+	// for i := 0; i < len(Cars); i++ {
+	// 	Cars[i].Id = respCars[i].Id
+	// }
+	cars := []Car{}
+	return cars, nil
 }
 
 func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {
 
-	reposCar := &repository.RepCar{
-		Id:     car.Id,
-		RegNum: car.RegNum,
-		Mark:   car.Mark,
-		Model:  car.Model,
-		Owner:  car.Owner,
-	}
-	reposCar, err := s.rep.UpdateCar(ctx, reposCar)
+	repCar := &repository.RepCar{}
+	//car := &Car{}
+
+	repCar.Id = car.Id
+	repCar.RegNum = car.RegNum
+	repCar.Mark = car.Mark
+	repCar.Model = car.Model
+	repCar.Year = car.Year
+	repCar.Name = car.Owner.Name
+	repCar.Surname = car.Owner.Surname
+	repCar.Patronymic = car.Owner.Patronymic
+
+	// 	Id:     car.Id,
+	// 	RegNum: car.RegNum,
+	// 	Mark:   car.Mark,
+	// 	Model:  car.Model,
+	// 	Owner:  car.Owner,
+	// }
+	respCar, err := s.rep.UpdateCar(ctx, repCar)
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error UpdateUser")
 	}
-	respCar := &Car{
-		Id:     reposCar.Id,
-		RegNum: reposCar.RegNum,
-		Mark:   reposCar.Mark,
-		Model:  reposCar.Model,
-		Owner:  reposCar.Owner,
-	}
-	return respCar, nil
+
+	car.Id = respCar.Id
+	car.RegNum = respCar.RegNum
+	car.Mark = respCar.Mark
+	car.Model = respCar.Model
+	car.Year = respCar.Year
+	car.Owner.Name = respCar.Name
+	car.Owner.Surname = respCar.Surname
+	car.Owner.Patronymic = respCar.Patronymic
+	return car, nil
 }

@@ -19,11 +19,14 @@ func NewRep(log *slog.Logger, dbx *sqlx.DB) *Rep {
 }
 
 type RepCar struct {
-	Id     int
-	RegNum string
-	Mark   string
-	Model  string
-	Owner  string
+	Id         int
+	RegNum     string
+	Mark       string
+	Model      string
+	Year       int
+	Name       string
+	Surname    string
+	Patronymic string
 }
 
 type RepQueryFilter struct {

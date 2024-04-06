@@ -16,7 +16,7 @@ type Repository interface {
 }
 
 type CarInfoProvider interface {
-	GetCarInfo(ctx context.Context, regNums []string) ([]*Car, error)
+	GetCarInfo(ctx context.Context, regNums []string) ([]Car, error)
 }
 
 type servImpl struct {
@@ -44,12 +44,27 @@ func NewServ(
 // 	Cars []*Car `json:"cars"`
 // }
 
+// type Car struct {
+// 	Id     int    `json:"id"`
+// 	RegNum string `json:"regnum"`
+// 	Mark   string `json:"mark"`
+// 	Model  string `json:"model"`
+// 	Owner  string `json:"owner"`
+// }
+
 type Car struct {
 	Id     int    `json:"id"`
 	RegNum string `json:"regnum"`
 	Mark   string `json:"mark"`
 	Model  string `json:"model"`
-	Owner  string `json:"owner"`
+	Year   int    `json:"year"`
+	Owner  People `json:"owner"`
+}
+
+type People struct {
+	Name       string `json:"name"`
+	Surname    string `json:"surname"`
+	Patronymic string `json:"patronymic"`
 }
 
 type QueryFilter struct {
