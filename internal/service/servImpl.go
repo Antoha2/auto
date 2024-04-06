@@ -3,7 +3,6 @@ package service
 import (
 	"auto/internal/repository"
 	"context"
-	"log"
 
 	"github.com/pkg/errors"
 )
@@ -68,39 +67,36 @@ func (s *servImpl) DeleteCar(ctx context.Context, id int) (*Car, error) {
 	return car, nil
 }
 
-func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) (*Car, error) {
+func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]*Car, error) {
 
-	repCar := &Car{}
-	log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", nums.Nums)
-	repCar, err := s.carInfoClient.GetCarInfo(ctx, nums.Nums)
+	Cars, err := s.carInfoClient.GetCarInfo(ctx, nums.Nums)
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error AddCar")
 	}
 
-	//
+	repCars := make([]*repository.RepCar, len(Cars))
 
-	//log.Println(repCar)
+	for i, car := range Cars {
 
-	// 	{
-	// 		RegNum: Car.RegNum,
-	// 		Mark:   Car.Mark,
-	// 		Model:  Car.Model,
-	// 		Owner:  Car.Owner,
-	// 	}
+		repCar := &repository.RepCar{
+			Mark:   car.Mark,
+			Model:  car.Model,
+			Owner:  car.Owner,
+			RegNum: car.RegNum,
+		}
+		repCars[i] = repCar
+	}
 
-	// 	repCar, err := s.rep.AddCar(ctx, repCar)
-	// 	if err != nil {
-	// 		return nil, errors.Wrap(err, "occurred error AddCar")
-	// 	}
+	respCars, err := s.rep.AddCar(ctx, repCars)
+	if err != nil {
+		return nil, errors.Wrap(err, "occurred error AddCar")
+	}
 
-	// 	respCar := &Car{
-	// 		Id:     repCar.Id,
-	// 		RegNum: repCar.RegNum,
-	// 		Mark:   repCar.Mark,
-	// 		Model:  repCar.Model,
-	// 		Owner:  repCar.Owner,
-	// 	}
-	return repCar, nil
+	for i := 0; i < len(Cars); i++ {
+		Cars[i].Id = respCars[i].Id
+	}
+
+	return Cars, nil
 }
 
 func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {

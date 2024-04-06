@@ -10,13 +10,13 @@ import (
 type Repository interface {
 	GetCar(ctx context.Context, id int) error
 	GetCars(ctx context.Context, filter *repository.RepQueryFilter) ([]*repository.RepCar, error)
-	AddCar(ctx context.Context, Car *repository.RepCar) (int, error)
+	AddCar(ctx context.Context, Car []*repository.RepCar) ([]*repository.RepCar, error)
 	DeleteCar(ctx context.Context, id int) (*repository.RepCar, error)
 	UpdateCar(ctx context.Context, Car *repository.RepCar) (*repository.RepCar, error)
 }
 
 type CarInfoProvider interface {
-	GetCarInfo(ctx context.Context, regNums []string) (*Car, error)
+	GetCarInfo(ctx context.Context, regNums []string) ([]*Car, error)
 }
 
 type servImpl struct {
@@ -39,6 +39,10 @@ func NewServ(
 		carInfoClient: carsInfoClient,
 	}
 }
+
+// type Cars struct {
+// 	Cars []*Car `json:"cars"`
+// }
 
 type Car struct {
 	Id     int    `json:"id"`

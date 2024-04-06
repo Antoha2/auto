@@ -181,7 +181,7 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 	const op = "updateCar"
 	log := a.log.With(slog.String("op", op))
 
-	Car := service.Car{}
+	Car := &service.Car{}
 
 	id, err := strconv.Atoi(c.Param(ID))
 	if err != nil {
@@ -198,9 +198,9 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 
 	Car.Id = id
 
-	log.Info("run update Car", sl.Atr("User", Car))
+	log.Info("run update Car", sl.Atr("Car", Car))
 
-	respCar, err := a.service.UpdateCar(c, &Car)
+	respCar, err := a.service.UpdateCar(c, Car)
 	if err != nil {
 		a.log.Error("occurred error update Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -214,7 +214,7 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 
 // get CarInfo
 func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
-
+	fmt.Println("44444444 ")
 	const op = "getCarInfo"
 	log := a.log.With(slog.String("op", op))
 	nums := &service.RegNums{}
@@ -224,20 +224,27 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 		return
 	}
 
-	car := &service.Car{
-		RegNum: "!!!!!!!!!!!!!!!", //nums.Nums[1],
-		Mark:   "mark",
-		Model:  "model",
-		Owner:  "owner",
+	//cars:=[]
+	car := service.Car{}
+	cars := []service.Car{}
+	//cars := make(car, len(nums.Nums))
+
+	for i := 0; i < len(nums.Nums); i++ {
+		car.Mark = string(i)
+		car.Model = string(i)
+		car.Owner = string(i)
+		car.RegNum = nums.Nums[i]
+		cars = append(cars, car)
 	}
 
-	//q := &resp{Id: 1}
+	fmt.Println("44444444 ")
 
-	//fmt.Println(" 12123123123 !!!!!!!!!!!!!!!!!!!! ", car)
+	// car := &service.Car{
+	// 	RegNum: "!!!!!!!!!!!!!!!", //nums.Nums[1],
+	// 	Mark:   "mark",
+	// 	Model:  "model",
+	// 	Owner:  "owner",
+	// }
 
-	c.JSON(http.StatusOK, car)
-}
-
-type resp struct {
-	Id int `json:"id"`
+	c.JSON(http.StatusOK, cars)
 }
