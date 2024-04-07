@@ -284,7 +284,7 @@ func inputValidation(s []string) bool {
 
 func checkRegNum(str string) bool {
 
-	if utf8.RuneCountInString(str) != 8 {
+	if utf8.RuneCountInString(str) != 8 && utf8.RuneCountInString(str) != 9 {
 		return false
 	}
 
@@ -292,7 +292,7 @@ func checkRegNum(str string) bool {
 	num := []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
 	rune := []rune(str)
 
-	for i := 0; i < 8; i++ {
+	for i := 0; i < len(rune); i++ {
 
 		c := fmt.Sprintf("%c", rune[i])
 
