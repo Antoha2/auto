@@ -9,7 +9,27 @@ type Config struct {
 	Env           string `env:"ENV" env-default:"local"`
 	HTTP          HTTPConfig
 	DBConfig      DBConfig
+	ServiceConst  ServiceConfig
+	ApiConst      ApiConfig
 	URLGetCarInfo string `env:"URL_GETCARINFO"`
+}
+
+type ServiceConfig struct {
+	DefaultPropertyOffset int `env:"DEFAULTPROPERTYOFFSET"`
+	DefaultPropertyLimit  int `env:"DEFAULTPROPERTYLIMIT"`
+}
+
+type ApiConfig struct {
+	ID         string `env:"API_ID"`     //"id"
+	LIMIT      string `env:"API_LIMIT"`  //"limit"
+	OFFSET     string `env:"API_OFFSET"` //"offset"
+	REGNUM     string `env:"API_REGNUM"` //"regNum"
+	MARK       string `env:"API_MARK"`   //"mark"
+	MODEL      string `env:"API_MODEL"`  //"model"
+	YEAR       string `env:"API_YEAR"`   //"year"
+	NAME       string `env:"API_NAME"`
+	SURNAME    string `env:"API_SURNAME"`
+	PATRONYMIC string `env:"API_PATRONYMIC"`
 }
 
 type DBConfig struct {

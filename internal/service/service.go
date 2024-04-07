@@ -72,7 +72,8 @@ type QueryFilter struct {
 	RegNum string `json:"regNum"`
 	Mark   string `json:"mark"`
 	Model  string `json:"model"`
-	Owner  string `json:"owner"`
+	Year   int    `json:"year"`
+	Owner  People `json:"owner"`
 	Offset int    `json:"offset"`
 	Limit  int    `json:"limit"`
 }

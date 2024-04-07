@@ -23,7 +23,6 @@ func (a *apiImpl) StartHTTP() error {
 	router.PUT("/CarInfo/:id", a.updateCarHandler) //update Car
 
 	router.GET("/CarInfo/GetCarInfo", a.getCarInfoHandler) //get CarInfo
-	router.GET("/CarInfo/test", a.getTestHandler)          //test
 
 	err := router.Run(fmt.Sprintf(":%s", a.cfg.HTTP.HostPort))
 	if err != nil {
@@ -44,7 +43,7 @@ func (a *apiImpl) getCarHandler(c *gin.Context) {
 	const op = "getCar"
 	log := a.log.With(slog.String("op", op))
 
-	id, err := strconv.Atoi(c.Param(ID))
+	id, err := strconv.Atoi(c.Param(a.cfg.ApiConst.ID))
 	if err != nil {
 		a.log.Error("id not match type", sl.Err(err))
 		c.JSON(http.StatusBadRequest, err)
@@ -60,7 +59,7 @@ func (a *apiImpl) getCarHandler(c *gin.Context) {
 		return
 	}
 
-	log.Info("get User successfully", sl.Atr("respCar", Car))
+	log.Info("get Car successfully", sl.Atr("respCar", Car))
 
 	c.JSON(http.StatusOK, Car)
 }
@@ -73,12 +72,12 @@ func (a *apiImpl) getCarsHandler(c *gin.Context) {
 
 	var err error
 
-	limit := service.DefaultPropertyLimit
-	offset := service.DefaultPropertyOffset
-
+	year := 0
+	limit := a.cfg.ServiceConst.DefaultPropertyLimit
+	offset := a.cfg.ServiceConst.DefaultPropertyOffset
 	q := c.Request.URL.Query()
 
-	qOffset := q.Get(OFFSET)
+	qOffset := q.Get(a.cfg.ApiConst.OFFSET)
 	if qOffset != "" {
 		offset, err = strconv.Atoi(qOffset)
 		if err != nil {
@@ -88,7 +87,7 @@ func (a *apiImpl) getCarsHandler(c *gin.Context) {
 		}
 	}
 
-	qLimit := q.Get(LIMIT)
+	qLimit := q.Get(a.cfg.ApiConst.LIMIT)
 	if qLimit != "" {
 		limit, err = strconv.Atoi(qLimit)
 		if err != nil {
@@ -97,14 +96,29 @@ func (a *apiImpl) getCarsHandler(c *gin.Context) {
 			return
 		}
 	}
-	CarsQuery := &service.QueryFilter{
-		RegNum: q.Get(REGNUM),
-		Mark:   q.Get(MARK),
-		Model:  q.Get(MODEL),
-		Owner:  q.Get(OWNER),
-		Offset: offset,
-		Limit:  limit,
+
+	qYear := q.Get(a.cfg.ApiConst.YEAR)
+	if qYear != "" {
+		year, err = strconv.Atoi(qYear)
+		if err != nil {
+			a.log.Error("year not match type", sl.Err(err))
+			c.JSON(http.StatusBadRequest, sl.Err(err))
+			return
+		}
 	}
+
+	CarsQuery := &service.QueryFilter{}
+
+	CarsQuery.RegNum = q.Get(a.cfg.ApiConst.REGNUM)
+	CarsQuery.Mark = q.Get(a.cfg.ApiConst.MARK)
+	CarsQuery.Model = q.Get(a.cfg.ApiConst.MODEL)
+	CarsQuery.Owner.Name = q.Get(a.cfg.ApiConst.NAME)
+	CarsQuery.Owner.Surname = q.Get(a.cfg.ApiConst.SURNAME)
+	CarsQuery.Owner.Patronymic = q.Get(a.cfg.ApiConst.PATRONYMIC)
+	CarsQuery.Year = year
+	CarsQuery.Limit = limit
+	CarsQuery.Offset = offset
+
 	log.Info("run get Cars", sl.Atr("filter", CarsQuery))
 
 	Cars, err := a.service.GetCars(c, CarsQuery)
@@ -132,8 +146,6 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 		return
 	}
 
-	///////////// CarInfo
-
 	log.Info("run add Cars", sl.Atr("RegNums", nums))
 
 	respCar, err := a.service.AddCar(c, nums)
@@ -155,7 +167,7 @@ func (a *apiImpl) delCarHandler(c *gin.Context) {
 	const op = "delCar"
 	log := a.log.With(slog.String("op", op))
 
-	id, err := strconv.Atoi(c.Param(ID))
+	id, err := strconv.Atoi(c.Param(a.cfg.ApiConst.ID))
 	if err != nil {
 		a.log.Error("id not match type", sl.Err(err))
 		c.JSON(http.StatusBadRequest, sl.Err(err))
@@ -182,26 +194,26 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 	const op = "updateCar"
 	log := a.log.With(slog.String("op", op))
 
-	Car := &service.Car{}
+	car := &service.Car{}
 
-	id, err := strconv.Atoi(c.Param(ID))
+	id, err := strconv.Atoi(c.Param(a.cfg.ApiConst.ID))
 	if err != nil {
 		a.log.Error("id not match type", sl.Err(err))
 		c.JSON(http.StatusBadRequest, sl.Err(err))
 		return
 	}
 
-	if err := c.BindJSON(&Car); err != nil {
+	if err := c.BindJSON(&car); err != nil {
 		a.log.Error("cant unmarshall update Car", sl.Err(err))
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	Car.Id = id
+	car.Id = id
 
-	log.Info("run update Car", sl.Atr("Car", Car))
+	log.Info("run update Car", sl.Atr("Car", car))
 
-	respCar, err := a.service.UpdateCar(c, Car)
+	respCar, err := a.service.UpdateCar(c, car)
 	if err != nil {
 		a.log.Error("occurred error update Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -225,15 +237,13 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 		return
 	}
 
-	//cars:=[]
 	car := service.Car{}
 	cars := []service.Car{}
-	//cars := make(car, len(nums.Nums))
 
 	for i := 0; i < len(nums.Nums); i++ {
 		car.Mark = strconv.Itoa(i + 3)
 		car.Model = strconv.Itoa(i * 4)
-		car.Year = i ^ 12
+		car.Year = i + 2000
 		car.Owner.Name = strconv.Itoa(i + 3)
 		car.Owner.Surname = strconv.Itoa(i + 3)
 		car.Owner.Patronymic = strconv.Itoa(i + 3)
@@ -241,20 +251,5 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 		cars = append(cars, car)
 	}
 
-	// car := &service.Car{
-	// 	RegNum: "!!!!!!!!!!!!!!!", //nums.Nums[1],
-	// 	Mark:   "mark",
-	// 	Model:  "model",
-	// 	Owner:  "owner",
-	// }
-
 	c.JSON(http.StatusOK, cars)
-}
-
-func (a *apiImpl) getTestHandler(c *gin.Context) {
-
-	// const op = "test"
-	// log := a.log.With(slog.String("op", op))
-
-	c.JSON(http.StatusOK, 0)
 }

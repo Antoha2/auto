@@ -30,11 +30,14 @@ type RepCar struct {
 }
 
 type RepQueryFilter struct {
-	Id     int
-	RegNum string
-	Mark   string
-	Model  string
-	Owner  string
-	Offset int
-	Limit  int
+	Id         int
+	RegNum     string
+	Mark       string
+	Model      string
+	Year       int
+	Name       string
+	Surname    string
+	Patronymic string
+	Offset     int
+	Limit      int
 }
