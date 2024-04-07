@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 
 	"auto/internal/service"
 
@@ -146,6 +147,13 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 		return
 	}
 
+	if !inputValidation(nums.Nums) {
+		err := errors.New("incorrect input data format")
+		log.Error("occurred error for run add Car", sl.Err(err))
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	log.Info("run add Cars", sl.Atr("RegNums", nums))
 
 	respCar, err := a.service.AddCar(c, nums)
@@ -209,6 +217,14 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 		return
 	}
 
+	if !updateDataCheck(car) {
+		err := errors.New("No update data")
+		a.log.Error("occurred error update Car", sl.Err(err))
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+
+	}
+
 	car.Id = id
 
 	log.Info("run update Car", sl.Atr("Car", car))
@@ -237,10 +253,11 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 		return
 	}
 
-	car := service.Car{}
 	cars := []service.Car{}
 
 	for i := 0; i < len(nums.Nums); i++ {
+
+		car := service.Car{}
 		car.Mark = strconv.Itoa(i + 3)
 		car.Model = strconv.Itoa(i * 4)
 		car.Year = i + 2000
@@ -252,4 +269,59 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, cars)
+}
+
+//checking the correctness of the entered data
+func inputValidation(s []string) bool {
+
+	for i := 0; i < len(s); i++ {
+		if !checkRegNum(s[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func checkRegNum(str string) bool {
+
+	if utf8.RuneCountInString(str) != 8 {
+		return false
+	}
+
+	s := []string{"а", "А", "в", "В", "е", "Е", "к", "К", "м", "М", "н", "Н", "о", "О", "р", "Р", "с", "С", "т", "Т", "у", "У", "х", "Х"}
+	num := []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
+	rune := []rune(str)
+
+	for i := 0; i < 8; i++ {
+
+		c := fmt.Sprintf("%c", rune[i])
+
+		if i == 0 || i == 4 || i == 5 {
+			if !checkSymbol(c, s) {
+				return false
+			}
+		} else {
+			if !checkSymbol(c, num) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func checkSymbol(c string, mas []string) bool {
+	for _, s := range mas {
+		if c == s {
+			return true
+		}
+	}
+	return false
+}
+
+//data availability check
+func updateDataCheck(car *service.Car) bool {
+	if car.RegNum == "" && car.Mark == "" && car.Model == "" && car.Year == 0 && car.Owner.Name == "" && car.Owner.Surname == "" && car.Owner.Patronymic == "" {
+		return false
+	}
+	return true
 }

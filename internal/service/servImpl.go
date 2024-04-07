@@ -48,6 +48,7 @@ func (s *servImpl) GetCars(ctx context.Context, filter *QueryFilter) ([]*Car, er
 
 // get car
 func (s *servImpl) GetCar(ctx context.Context, id int) (*Car, error) {
+
 	repCar, err := s.rep.GetCar(ctx, id)
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error GetCar")
@@ -89,6 +90,10 @@ func (s *servImpl) DeleteCar(ctx context.Context, id int) (*Car, error) {
 
 //add car
 func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]Car, error) {
+
+	if len(nums.Nums) == 0 {
+		return nil, errors.Wrap(errors.New("No add data"), "occurred error AddCar")
+	}
 
 	Cars, err := s.carInfoClient.GetCarInfo(ctx, nums.Nums)
 	if err != nil {
@@ -140,7 +145,7 @@ func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {
 
 	respCar, err := s.rep.UpdateCar(ctx, repCar)
 	if err != nil {
-		return nil, errors.Wrap(err, "occurred error UpdateUser")
+		return nil, errors.Wrap(err, "occurred error UpdateCar")
 	}
 
 	car.Id = respCar.Id

@@ -20,16 +20,16 @@ type ServiceConfig struct {
 }
 
 type ApiConfig struct {
-	ID         string `env:"API_ID"`     //"id"
-	LIMIT      string `env:"API_LIMIT"`  //"limit"
-	OFFSET     string `env:"API_OFFSET"` //"offset"
-	REGNUM     string `env:"API_REGNUM"` //"regNum"
-	MARK       string `env:"API_MARK"`   //"mark"
-	MODEL      string `env:"API_MODEL"`  //"model"
-	YEAR       string `env:"API_YEAR"`   //"year"
-	NAME       string `env:"API_NAME"`
-	SURNAME    string `env:"API_SURNAME"`
-	PATRONYMIC string `env:"API_PATRONYMIC"`
+	ID         string `env:"API_ID"`         //"id"
+	LIMIT      string `env:"API_LIMIT"`      //"limit"
+	OFFSET     string `env:"API_OFFSET"`     //"offset"
+	REGNUM     string `env:"API_REGNUM"`     //"regNum"
+	MARK       string `env:"API_MARK"`       //"mark"
+	MODEL      string `env:"API_MODEL"`      //"model"
+	YEAR       string `env:"API_YEAR"`       //"year"
+	NAME       string `env:"API_NAME"`       //name
+	SURNAME    string `env:"API_SURNAME"`    //surname
+	PATRONYMIC string `env:"API_PATRONYMIC"` //patronymic
 }
 
 type DBConfig struct {

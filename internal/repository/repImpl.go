@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+//get car
 func (r *Rep) GetCar(ctx context.Context, id int) (*RepCar, error) {
 
 	car := new(RepCar)
@@ -21,6 +22,7 @@ func (r *Rep) GetCar(ctx context.Context, id int) (*RepCar, error) {
 	return car, nil
 }
 
+//get cars
 func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, error) {
 
 	cars := make([]*RepCar, 0)
@@ -46,6 +48,7 @@ func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, e
 	return cars, nil
 }
 
+// add car
 func (r *Rep) AddCar(ctx context.Context, Cars []*RepCar) ([]RepCar, error) {
 
 	s := buildQueryAddCarConstrain(Cars)
@@ -72,6 +75,7 @@ func (r *Rep) AddCar(ctx context.Context, Cars []*RepCar) ([]RepCar, error) {
 	return repCars, nil
 }
 
+// delete car
 func (r *Rep) DeleteCar(ctx context.Context, id int) (*RepCar, error) {
 
 	car := new(RepCar)
@@ -85,6 +89,7 @@ func (r *Rep) DeleteCar(ctx context.Context, id int) (*RepCar, error) {
 	return car, nil
 }
 
+// update car
 func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 
 	repCar := &RepCar{}
