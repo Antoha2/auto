@@ -42,18 +42,6 @@ func NewServ(
 	}
 }
 
-// type Cars struct {
-// 	Cars []*Car `json:"cars"`
-// }
-
-// type Car struct {
-// 	Id     int    `json:"id"`
-// 	RegNum string `json:"regnum"`
-// 	Mark   string `json:"mark"`
-// 	Model  string `json:"model"`
-// 	Owner  string `json:"owner"`
-// }
-
 type Car struct {
 	Id     int    `json:"id"`
 	RegNum string `json:"regnum"`

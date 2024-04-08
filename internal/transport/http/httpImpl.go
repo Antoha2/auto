@@ -16,6 +16,7 @@ import (
 )
 
 func (a *apiImpl) StartHTTP() error {
+
 	router := gin.Default()
 	router.GET("/carinfo/:id", a.getCarHandler)    //get Car
 	router.GET("/carinfo/", a.getCarsHandler)      //get Car
@@ -33,6 +34,7 @@ func (a *apiImpl) StartHTTP() error {
 }
 
 func (a *apiImpl) Stop() {
+
 	if err := a.server.Shutdown(context.TODO()); err != nil {
 		panic(errors.Wrap(err, "ocurred error Stop"))
 	}
@@ -141,6 +143,7 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 	log := a.log.With(slog.String("op", op))
 
 	nums := &service.RegNums{}
+
 	if err := c.BindJSON(&nums); err != nil {
 		log.Error("cant unmarshall", sl.Err(err))
 		c.JSON(http.StatusBadRequest, err.Error())
