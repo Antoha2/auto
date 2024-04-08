@@ -17,13 +17,13 @@ import (
 
 func (a *apiImpl) StartHTTP() error {
 	router := gin.Default()
-	router.GET("/CarInfo/:id", a.getCarHandler)    //get Car
-	router.GET("/CarInfo/", a.getCarsHandler)      //get Car
-	router.POST("/CarInfo/", a.addCarHandler)      //add Car
-	router.DELETE("/CarInfo/:id", a.delCarHandler) //del Car
-	router.PUT("/CarInfo/:id", a.updateCarHandler) //update Car
+	router.GET("/carinfo/:id", a.getCarHandler)    //get Car
+	router.GET("/carinfo/", a.getCarsHandler)      //get Car
+	router.POST("/carinfo/", a.addCarHandler)      //add Car
+	router.DELETE("/carinfo/:id", a.delCarHandler) //del Car
+	router.PUT("/carinfo/:id", a.updateCarHandler) //update Car
 
-	router.GET("/CarInfo/GetCarInfo", a.getCarInfoHandler) //get CarInfo
+	router.GET("/carinfo/get_carinfo", a.getCarInfoHandler) //get CarInfo
 
 	err := router.Run(fmt.Sprintf(":%s", a.cfg.HTTP.HostPort))
 	if err != nil {
@@ -246,6 +246,7 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 
 	const op = "getCarInfo"
 	log := a.log.With(slog.String("op", op))
+
 	nums := &service.RegNums{}
 	if err := c.BindJSON(&nums); err != nil {
 		log.Error("cant unmarshall", sl.Err(err))
@@ -253,11 +254,11 @@ func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 		return
 	}
 
-	cars := []service.Car{}
+	cars := []*service.Car{}
 
 	for i := 0; i < len(nums.Nums); i++ {
 
-		car := service.Car{}
+		car := &service.Car{}
 		car.Mark = strconv.Itoa(i + 3)
 		car.Model = strconv.Itoa(i * 4)
 		car.Year = i + 2000
@@ -310,6 +311,7 @@ func checkRegNum(str string) bool {
 }
 
 func checkSymbol(c string, mas []string) bool {
+
 	for _, s := range mas {
 		if c == s {
 			return true
@@ -320,6 +322,7 @@ func checkSymbol(c string, mas []string) bool {
 
 //data availability check
 func updateDataCheck(car *service.Car) bool {
+
 	if car.RegNum == "" && car.Mark == "" && car.Model == "" && car.Year == 0 && car.Owner.Name == "" && car.Owner.Surname == "" && car.Owner.Patronymic == "" {
 		return false
 	}

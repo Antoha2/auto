@@ -22,6 +22,7 @@ func (s *servImpl) GetCars(ctx context.Context, filter *QueryFilter) ([]*Car, er
 		Limit:      filter.Limit,
 		Offset:     filter.Offset,
 	}
+
 	repCars, err := s.rep.GetCars(ctx, readFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error GetCars")
@@ -29,19 +30,7 @@ func (s *servImpl) GetCars(ctx context.Context, filter *QueryFilter) ([]*Car, er
 
 	Cars := make([]*Car, len(repCars))
 	for index, repCar := range repCars {
-
-		car := &Car{}
-
-		car.Id = repCar.Id
-		car.RegNum = repCar.RegNum
-		car.Mark = repCar.Mark
-		car.Model = repCar.Model
-		car.Year = repCar.Year
-		car.Owner.Name = repCar.Name
-		car.Owner.Surname = repCar.Surname
-		car.Owner.Patronymic = repCar.Patronymic
-
-		Cars[index] = car
+		Cars[index] = s.ServTypeMaping(repCar)
 	}
 	return Cars, nil
 }
@@ -54,18 +43,7 @@ func (s *servImpl) GetCar(ctx context.Context, id int) (*Car, error) {
 		return nil, errors.Wrap(err, "occurred error GetCar")
 	}
 
-	car := &Car{}
-
-	car.Id = repCar.Id
-	car.RegNum = repCar.RegNum
-	car.Mark = repCar.Mark
-	car.Model = repCar.Model
-	car.Year = repCar.Year
-	car.Owner.Name = repCar.Name
-	car.Owner.Surname = repCar.Surname
-	car.Owner.Patronymic = repCar.Patronymic
-
-	return car, nil
+	return s.ServTypeMaping(repCar), nil
 }
 
 // delete car
@@ -74,22 +52,12 @@ func (s *servImpl) DeleteCar(ctx context.Context, id int) (*Car, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "occurred error DeleteCar")
 	}
-	car := &Car{}
 
-	car.Id = repCar.Id
-	car.RegNum = repCar.RegNum
-	car.Mark = repCar.Mark
-	car.Model = repCar.Model
-	car.Year = repCar.Year
-	car.Owner.Name = repCar.Name
-	car.Owner.Surname = repCar.Surname
-	car.Owner.Patronymic = repCar.Patronymic
-
-	return car, nil
+	return s.ServTypeMaping(repCar), nil
 }
 
 //add car
-func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]Car, error) {
+func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]*Car, error) {
 
 	if len(nums.Nums) == 0 {
 		return nil, errors.Wrap(errors.New("No add data"), "occurred error AddCar")
@@ -101,20 +69,8 @@ func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]Car, error) {
 	}
 
 	repCars := make([]*repository.RepCar, len(Cars))
-
 	for i, car := range Cars {
-
-		repCar := &repository.RepCar{
-			RegNum:     car.RegNum,
-			Mark:       car.Mark,
-			Model:      car.Model,
-			Year:       car.Year,
-			Name:       car.Owner.Name,
-			Surname:    car.Owner.Surname,
-			Patronymic: car.Owner.Patronymic,
-		}
-
-		repCars[i] = repCar
+		repCars[i] = s.RepTypeMaping(car)
 	}
 
 	respCars, err := s.rep.AddCar(ctx, repCars)
@@ -132,6 +88,17 @@ func (s *servImpl) AddCar(ctx context.Context, nums *RegNums) ([]Car, error) {
 //update car
 func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {
 
+	respCar, err := s.rep.UpdateCar(ctx, s.RepTypeMaping(car))
+	if err != nil {
+		return nil, errors.Wrap(err, "occurred error UpdateCar")
+	}
+
+	return s.ServTypeMaping(respCar), nil
+}
+
+//change type service to repository
+func (s *servImpl) RepTypeMaping(car *Car) *repository.RepCar {
+
 	repCar := &repository.RepCar{}
 
 	repCar.Id = car.Id
@@ -143,10 +110,13 @@ func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {
 	repCar.Surname = car.Owner.Surname
 	repCar.Patronymic = car.Owner.Patronymic
 
-	respCar, err := s.rep.UpdateCar(ctx, repCar)
-	if err != nil {
-		return nil, errors.Wrap(err, "occurred error UpdateCar")
-	}
+	return repCar
+}
+
+//change type repository to service
+func (s *servImpl) ServTypeMaping(respCar *repository.RepCar) *Car {
+
+	car := &Car{}
 
 	car.Id = respCar.Id
 	car.RegNum = respCar.RegNum
@@ -156,5 +126,6 @@ func (s *servImpl) UpdateCar(ctx context.Context, car *Car) (*Car, error) {
 	car.Owner.Name = respCar.Name
 	car.Owner.Surname = respCar.Surname
 	car.Owner.Patronymic = respCar.Patronymic
-	return car, nil
+
+	return car
 }

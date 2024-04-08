@@ -39,7 +39,7 @@ type Nums struct {
 	Nums []string `json:"regnums"`
 }
 
-func (s *carInfoImpl) GetCarInfo(ctx context.Context, regNums []string) ([]service.Car, error) {
+func (s *carInfoImpl) GetCarInfo(ctx context.Context, regNums []string) ([]*service.Car, error) {
 
 	nums := &Nums{Nums: regNums}
 
@@ -58,7 +58,7 @@ func (s *carInfoImpl) GetCarInfo(ctx context.Context, regNums []string) ([]servi
 	}
 	defer resp.Body.Close()
 
-	cars := []service.Car{}
+	cars := []*service.Car{}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

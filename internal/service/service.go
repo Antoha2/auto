@@ -13,10 +13,12 @@ type Repository interface {
 	AddCar(ctx context.Context, Car []*repository.RepCar) ([]*repository.RepCar, error)
 	DeleteCar(ctx context.Context, id int) (*repository.RepCar, error)
 	UpdateCar(ctx context.Context, Car *repository.RepCar) (*repository.RepCar, error)
+	RepTypeMaping(car *Car) *repository.RepCar
+	ServTypeMaping(respCar *repository.RepCar) *Car
 }
 
 type CarInfoProvider interface {
-	GetCarInfo(ctx context.Context, regNums []string) ([]Car, error)
+	GetCarInfo(ctx context.Context, regNums []string) ([]*Car, error)
 }
 
 type servImpl struct {
