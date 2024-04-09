@@ -28,7 +28,9 @@ func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, e
 	cars := make([]*RepCar, 0)
 	queryConstrain, args := buildQueryGetCarsConstrain(filter)
 
-	query := fmt.Sprintf("SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars%s LIMIT %d OFFSET %d", queryConstrain, filter.Limit, filter.Offset)
+	query := fmt.Sprintf("SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars%s LIMIT $%d OFFSET $%d", queryConstrain, len(args)+1, len(args)+2)
+	args = append(args, filter.Limit, filter.Offset)
+	//args = append(args, filter.Offset)
 
 	rows, err := r.DB.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -98,7 +100,7 @@ func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 
 	query := fmt.Sprintf("UPDATE cars SET %s RETURNING id, regnum, mark, model, year, name, surname, patronymic", s)
 
-	row := r.DB.QueryRowContext(ctx, query, args...) // car.Id)
+	row := r.DB.QueryRowContext(ctx, query, args...)
 	if err := row.Scan(&repCar.Id, &repCar.RegNum, &repCar.Mark, &repCar.Model, &repCar.Year, &repCar.Name, &repCar.Surname, &repCar.Patronymic); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("sql update car failed, query: %s", query))
 	}
