@@ -15,6 +15,7 @@ type Repository interface {
 	UpdateCar(ctx context.Context, Car *repository.RepCar) (*repository.RepCar, error)
 	RepTypeMaping(car *Car) *repository.RepCar
 	ServTypeMaping(respCar *repository.RepCar) *Car
+	ChekId(id int) (bool, error)
 }
 
 type CarInfoProvider interface {

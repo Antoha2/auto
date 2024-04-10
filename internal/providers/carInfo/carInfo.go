@@ -39,19 +39,6 @@ type RegNums struct {
 	Nums []string `json:"regnums"`
 }
 
-// @BasePath  /
-// @host asdasdasd
-
-// @Summary get additional car info from external sources
-// @Schemes
-// @Description get additional car info from external sources
-// @Accept json
-// @Produce json
-// @Param regNums body provider.RegNums true "parameters of the record being updated"
-// @Success 200 {object} []provider.Car "received records"
-// @Failure 400  400  {object}  httputil.HTTPError
-// @Failure 500   500  {object}  httputil.HTTPError
-
 func (s *carInfoImpl) GetCarInfo(ctx context.Context, regNums []string) ([]*service.Car, error) {
 
 	nums := &RegNums{Nums: regNums}

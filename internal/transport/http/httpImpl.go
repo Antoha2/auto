@@ -70,7 +70,7 @@ func (a *apiImpl) Stop() {
 // @Produce json
 // @Param  id     query    int     true        "ID"
 // @Success 200 {object} service.Car "read record"
-// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 404  404  {object}  httputil.HTTPError
 // @Failure 500   500  {object}  httputil.HTTPError
 // @Router /info/:id [get]
 func (a *apiImpl) GetCarHandler(c *gin.Context) {
@@ -95,7 +95,7 @@ func (a *apiImpl) GetCarHandler(c *gin.Context) {
 	}
 
 	if car.Id == 0 {
-		log.Info("get Car successfully", sl.Atr("respCar", car))
+		a.log.Error("occurred error for GetCar", sl.Err(errors.New("record with this id not found")))
 		c.JSON(http.StatusNotFound, "record with this id not found")
 	} else {
 
@@ -240,7 +240,7 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 // @Produce json
 // @Param id query int true "ID delete car"
 // @Success 200 {object} service.Car "deleted record"
-// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 404  404  {object}  httputil.HTTPError
 // @Failure 500   500  {object}  httputil.HTTPError
 // @Router /info/:id [delete]
 func (a *apiImpl) delCarHandler(c *gin.Context) {
@@ -257,16 +257,21 @@ func (a *apiImpl) delCarHandler(c *gin.Context) {
 
 	log.Info("run del Car by ID", sl.Atr("id", id))
 
-	Car, err := a.service.DeleteCar(c, id)
+	car, err := a.service.DeleteCar(c, id)
 	if err != nil {
 		a.log.Error("occurred error del Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("del Car successfully", sl.Atr("respCar", Car))
+	if car.Id == 0 {
+		a.log.Error("occurred error for GetCar", sl.Err(errors.New("record with this id not found")))
+		c.JSON(http.StatusNotFound, "record with this id not found")
+	} else {
 
-	c.JSON(http.StatusOK, Car)
+		log.Info("del Car successfully", sl.Atr("respCar", car))
+		c.JSON(http.StatusOK, car)
+	}
 }
 
 // updateCarHandler godoc
@@ -277,7 +282,7 @@ func (a *apiImpl) delCarHandler(c *gin.Context) {
 // @Produce json
 // @Param car body service.Car true "parameters of the record being updated"
 // @Success 201 {object} service.Car "updated record"
-// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 404  404  {object}  httputil.HTTPError
 // @Failure 500   500  {object}  httputil.HTTPError
 // @Router /info/:id [put]
 func (a *apiImpl) updateCarHandler(c *gin.Context) {
@@ -319,9 +324,13 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 		return
 	}
 
-	log.Info("update Car successfully", sl.Atr("respCar", respCar))
-
-	c.JSON(http.StatusCreated, respCar)
+	if respCar.Id == 0 {
+		a.log.Error("occurred error for GetCar", sl.Err(errors.New("record with this id not found")))
+		c.JSON(http.StatusNotFound, "record with this id not found")
+	} else {
+		log.Info("update Car successfully", sl.Atr("respCar", respCar))
+		c.JSON(http.StatusCreated, respCar)
+	}
 }
 
 // external data source emulator

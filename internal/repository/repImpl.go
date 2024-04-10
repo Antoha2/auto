@@ -11,22 +11,19 @@ import (
 //get car
 func (r *Rep) GetCar(ctx context.Context, id int) (*RepCar, error) {
 
-	car := new(RepCar)
-	count := 0
+	car := &RepCar{}
 
-	query := "SELECT count(id) FROM cars WHERE id = $1"
-	row := r.DB.QueryRowContext(ctx, query, id)
-	if err := row.Scan(&count); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("sql select Car failed, query: %s", query))
+	check, err := r.CheckId(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "sql select Car failed, not found")
 	}
 
-	if count == 0 {
+	if !check {
 		return car, nil
 	}
 
-	query = "SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars WHERE id = $1"
-	row = r.DB.QueryRowContext(ctx, query, id)
-
+	query := "SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars WHERE id = $1"
+	row := r.DB.QueryRowContext(ctx, query, id)
 	if err := row.Scan(&car.Id, &car.RegNum, &car.Mark, &car.Model, &car.Year, &car.Name, &car.Surname, &car.Patronymic); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("sql select Car failed, query: %s", query))
 	}
@@ -42,7 +39,6 @@ func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, e
 
 	query := fmt.Sprintf("SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars%s LIMIT $%d OFFSET $%d", queryConstrain, len(args)+1, len(args)+2)
 	args = append(args, filter.Limit, filter.Offset)
-	//args = append(args, filter.Offset)
 
 	rows, err := r.DB.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -66,10 +62,9 @@ func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, e
 func (r *Rep) AddCar(ctx context.Context, Cars []*RepCar) ([]RepCar, error) {
 
 	s := buildQueryAddCarConstrain(Cars)
-	//log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", args)
 	query := fmt.Sprintf("INSERT INTO cars (regnum, mark, model, year, name, surname, patronymic) VALUES %s RETURNING id, regnum, mark, model, year, name, surname, patronymic", s)
 
-	rows, err := r.DB.QueryContext(ctx, query) //, args...)
+	rows, err := r.DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("sql add Cars failed, query: %s", query))
 	}
@@ -95,6 +90,15 @@ func (r *Rep) DeleteCar(ctx context.Context, id int) (*RepCar, error) {
 
 	car := new(RepCar)
 
+	check, err := r.CheckId(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "sql select Car failed, not found")
+	}
+
+	if !check {
+		return car, nil
+	}
+
 	query := "DELETE FROM cars WHERE id = $1 RETURNING id, regnum, mark, model, year, name, surname, patronymic"
 	row := r.DB.QueryRowContext(ctx, query, id)
 	if err := row.Scan(&car.Id, &car.RegNum, &car.Mark, &car.Model, &car.Year, &car.Name, &car.Surname, &car.Patronymic); err != nil {
@@ -108,6 +112,15 @@ func (r *Rep) DeleteCar(ctx context.Context, id int) (*RepCar, error) {
 func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 
 	repCar := &RepCar{}
+	check, err := r.CheckId(ctx, car.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "sql select Car failed, not found")
+	}
+
+	if !check {
+		car.Id = 0
+		return car, nil
+	}
 
 	s, args := buildQueryUpdateCarConstrain(car)
 
@@ -122,14 +135,14 @@ func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 }
 
 //build query string
-func buildQueryAddCarConstrain(cars []*RepCar) string { //, []any) {
+func buildQueryAddCarConstrain(cars []*RepCar) string {
 	constrains := make([]string, 0, len(cars))
 	for _, car := range cars {
 		s := fmt.Sprintf("('%s','%s','%s','%d','%s','%s','%s')", car.RegNum, car.Mark, car.Model, car.Year, car.Name, car.Surname, car.Patronymic)
 		constrains = append(constrains, s)
 	}
 
-	return strings.Join(constrains, ",") //, args
+	return strings.Join(constrains, ",")
 }
 
 func buildQueryGetCarsConstrain(filter *RepQueryFilter) (string, []any) {
@@ -256,4 +269,21 @@ func buildQueryUpdateCarConstrain(filter *RepCar) (string, []any) {
 	args = append(args, filter.Id)
 
 	return queryConstrain, args
+}
+
+//checking for the presence of a record with the same ID
+func (r *Rep) CheckId(ctx context.Context, id int) (bool, error) {
+
+	count := 0
+	query := "SELECT count(id) FROM cars WHERE id = $1"
+	row := r.DB.QueryRowContext(ctx, query, id)
+	if err := row.Scan(&count); err != nil {
+		return false, errors.Wrap(err, fmt.Sprintf("sql select Car failed, query: %s", query))
+	}
+
+	if count == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
