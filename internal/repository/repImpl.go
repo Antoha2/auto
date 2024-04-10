@@ -54,9 +54,10 @@ func (r *Rep) GetCars(ctx context.Context, filter *RepQueryFilter) ([]*RepCar, e
 func (r *Rep) AddCar(ctx context.Context, Cars []*RepCar) ([]RepCar, error) {
 
 	s := buildQueryAddCarConstrain(Cars)
+	//log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", args)
 	query := fmt.Sprintf("INSERT INTO cars (regnum, mark, model, year, name, surname, patronymic) VALUES %s RETURNING id, regnum, mark, model, year, name, surname, patronymic", s)
 
-	rows, err := r.DB.QueryContext(ctx, query)
+	rows, err := r.DB.QueryContext(ctx, query) //, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("sql add Cars failed, query: %s", query))
 	}
@@ -109,14 +110,19 @@ func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 }
 
 //build query string
-func buildQueryAddCarConstrain(cars []*RepCar) string {
+func buildQueryAddCarConstrain(cars []*RepCar) string { //, []any) {
+	//i := 1
+	//	args := make([]any, 0)
 	constrains := make([]string, 0, len(cars))
 	for _, car := range cars {
+		//	s := fmt.Sprintf("('$%d','$%d','$%d',$%d,'$%d','$%d','$%d')", i, i+1, i+2, i+3, i+4, i+5, i+6)
+		//	i = i + 7
 		s := fmt.Sprintf("('%s','%s','%s','%d','%s','%s','%s')", car.RegNum, car.Mark, car.Model, car.Year, car.Name, car.Surname, car.Patronymic)
 		constrains = append(constrains, s)
+		//args = append(args, car.RegNum, car.Mark, car.Model, car.Year, car.Name, car.Surname, car.Patronymic)
 	}
 
-	return strings.Join(constrains, ",")
+	return strings.Join(constrains, ",") //, args
 }
 
 func buildQueryGetCarsConstrain(filter *RepQueryFilter) (string, []any) {

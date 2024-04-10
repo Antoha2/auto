@@ -11,20 +11,41 @@ import (
 
 	"auto/internal/service"
 
+	_ "auto/cmd/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @Car info
+// @version 0.0.1
+
+// @contact.name   Lebedev A.S.
+// @contact.email  9112441775@mail.ru
+
+//@title Car Info
+
+// @BasePath  /info/
+// @host http://127.0.0.1:80
+
+// @Tags         API
 
 func (a *apiImpl) StartHTTP() error {
 
 	router := gin.Default()
-	router.GET("/carinfo/:id", a.getCarHandler)    //get Car
-	router.GET("/carinfo/", a.getCarsHandler)      //get Car
-	router.POST("/carinfo/", a.addCarHandler)      //add Car
-	router.DELETE("/carinfo/:id", a.delCarHandler) //del Car
-	router.PUT("/carinfo/:id", a.updateCarHandler) //update Car
 
-	router.GET("/carinfo/get_carinfo", a.getCarInfoHandler) //get CarInfo
+	router.GET("/info/:id", a.GetCarHandler)    //get Car
+	router.GET("/info/", a.getCarsHandler)      //get Car
+	router.POST("/info/", a.addCarHandler)      //add Car
+	router.DELETE("/info/:id", a.delCarHandler) //del Car
+	router.PUT("/info/:id", a.updateCarHandler) //update Car
+
+	router.GET("/info/get_carinfo", a.getCarInfoHandler) //get CarInfo
+
+	URLSwagger := ginSwagger.URL("http://127.0.0.1:80/swagger/doc.json")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, URLSwagger)) //*any
 
 	err := router.Run(fmt.Sprintf(":%s", a.cfg.HTTP.HostPort))
 	if err != nil {
@@ -40,8 +61,17 @@ func (a *apiImpl) Stop() {
 	}
 }
 
-// get Car
-func (a *apiImpl) getCarHandler(c *gin.Context) {
+// @Summary get car info by id from the database
+// @Schemes
+// @Description  get car info by id from the database
+// @Accept json
+// @Produce json
+// @Param  id     query    int     true        "ID"
+// @Success 200 {object} service.Car "read record"
+// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 500   500  {object}  httputil.HTTPError
+// @Router /info/:id [get]
+func (a *apiImpl) GetCarHandler(c *gin.Context) {
 
 	const op = "getCar"
 	log := a.log.With(slog.String("op", op))
@@ -67,7 +97,21 @@ func (a *apiImpl) getCarHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, Car)
 }
 
-// get Cars
+// @Summary get Cars info from the database
+// @Schemes
+// @Description get Cars info from the database with a search filter
+// @Accept json
+// @Produce json
+// @Param regNum query string false "regNum"
+// @Param mark query string false "mark"
+// @Param year query int false "year"
+// @Param name query string false "owner.name"
+// @Param surname query string false "owner.surname"
+// @Param patronymic query string false "owner.patronymic"
+// @Success 200 {object} []service.Car "read records"
+// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 500   500  {object}  httputil.HTTPError
+// @Router /info/ [get]
 func (a *apiImpl) getCarsHandler(c *gin.Context) {
 
 	const op = "getCars"
@@ -136,7 +180,16 @@ func (a *apiImpl) getCarsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, Cars)
 }
 
-// add
+// @Summary add car info to to database
+// @Schemes
+// @Description add car info to database
+// @Accept json
+// @Produce json
+// @Param regNums body service.RegNums true "slice reg numbers"
+// @Success 200 {object} []service.Car "added records"
+// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 500   500  {object}  httputil.HTTPError
+// @Router /info/ [post]
 func (a *apiImpl) addCarHandler(c *gin.Context) {
 
 	const op = "addCars"
@@ -172,7 +225,16 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, respCar)
 }
 
-// del
+// @Summary del car info from the database
+// @Schemes
+// @Description del car info from the database
+// @Accept json
+// @Produce json
+// @Param id query int true "ID delete car"
+// @Success 200 {object} service.Car "deleted record"
+// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 500   500  {object}  httputil.HTTPError
+// @Router /info/:id [delete]
 func (a *apiImpl) delCarHandler(c *gin.Context) {
 
 	const op = "delCar"
@@ -199,7 +261,16 @@ func (a *apiImpl) delCarHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, Car)
 }
 
-// update
+// @Summary update car info in the database
+// @Schemes
+// @Description update car info in the database
+// @Accept json
+// @Produce json
+// @Param car body service.Car true "parameters of the record being updated"
+// @Success 200 {object} service.Car "updated record"
+// @Failure 400  400  {object}  httputil.HTTPError
+// @Failure 500   500  {object}  httputil.HTTPError
+// @Router /info/:id [put]
 func (a *apiImpl) updateCarHandler(c *gin.Context) {
 
 	const op = "updateCar"
@@ -244,7 +315,7 @@ func (a *apiImpl) updateCarHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, respCar)
 }
 
-// get CarInfo
+// external data source emulator
 func (a *apiImpl) getCarInfoHandler(c *gin.Context) {
 
 	const op = "getCarInfo"

@@ -1,0 +1,211 @@
+basePath: /info/
+definitions:
+  service.Car:
+    description: Car info information with regNum
+    properties:
+      id:
+        example: 1
+        type: integer
+      mark:
+        example: Lada
+        type: string
+      model:
+        example: Vesta
+        type: string
+      owner:
+        $ref: '#/definitions/service.People'
+      regnum:
+        example: X123XX150
+        type: string
+      year:
+        example: 2020
+        type: integer
+    type: object
+  service.People:
+    properties:
+      name:
+        example: name
+        type: string
+      patronymic:
+        example: patronymic
+        type: string
+      surname:
+        example: surname
+        type: string
+    type: object
+  service.RegNums:
+    description: regNum list
+    properties:
+      regNums:
+        example:
+        - X123XX150
+        items:
+          type: string
+        type: array
+    type: object
+host: http://127.0.0.1:80
+info:
+  contact:
+    email: 9112441775@mail.ru
+    name: Lebedev A.S.
+  title: Car Info
+  version: 0.0.1
+paths:
+  /info/:
+    get:
+      consumes:
+      - application/json
+      description: get Cars info from the database with a search filter
+      parameters:
+      - description: regNum
+        in: query
+        name: regNum
+        type: string
+      - description: mark
+        in: query
+        name: mark
+        type: string
+      - description: year
+        in: query
+        name: year
+        type: integer
+      - description: owner.name
+        in: query
+        name: name
+        type: string
+      - description: owner.surname
+        in: query
+        name: surname
+        type: string
+      - description: owner.patronymic
+        in: query
+        name: patronymic
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: read records
+          schema:
+            items:
+              $ref: '#/definitions/service.Car'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: "400"
+        "500":
+          description: Internal Server Error
+          schema:
+            type: "500"
+      summary: get Cars info from the database
+    post:
+      consumes:
+      - application/json
+      description: add car info to database
+      parameters:
+      - description: slice reg numbers
+        in: body
+        name: regNums
+        required: true
+        schema:
+          $ref: '#/definitions/service.RegNums'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: added records
+          schema:
+            items:
+              $ref: '#/definitions/service.Car'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: "400"
+        "500":
+          description: Internal Server Error
+          schema:
+            type: "500"
+      summary: add car info to to database
+  /info/:id:
+    delete:
+      consumes:
+      - application/json
+      description: del car info from the database
+      parameters:
+      - description: ID delete car
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: deleted record
+          schema:
+            $ref: '#/definitions/service.Car'
+        "400":
+          description: Bad Request
+          schema:
+            type: "400"
+        "500":
+          description: Internal Server Error
+          schema:
+            type: "500"
+      summary: del car info from the database
+    get:
+      consumes:
+      - application/json
+      description: get car info by id from the database
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: read record
+          schema:
+            $ref: '#/definitions/service.Car'
+        "400":
+          description: Bad Request
+          schema:
+            type: "400"
+        "500":
+          description: Internal Server Error
+          schema:
+            type: "500"
+      summary: get car info by id from the database
+    put:
+      consumes:
+      - application/json
+      description: update car info in the database
+      parameters:
+      - description: parameters of the record being updated
+        in: body
+        name: car
+        required: true
+        schema:
+          $ref: '#/definitions/service.Car'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: updated record
+          schema:
+            $ref: '#/definitions/service.Car'
+        "400":
+          description: Bad Request
+          schema:
+            type: "400"
+        "500":
+          description: Internal Server Error
+          schema:
+            type: "500"
+      summary: update car info in the database
+swagger: "2.0"

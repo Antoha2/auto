@@ -42,32 +42,44 @@ func NewServ(
 	}
 }
 
+// Car model info
+// @Description Car info information
+// @Description with regNum
 type Car struct {
-	Id     int    `json:"id"`
-	RegNum string `json:"regnum"`
-	Mark   string `json:"mark"`
-	Model  string `json:"model"`
-	Year   int    `json:"year"`
+	Id     int    `json:"id"  example:"1"`
+	RegNum string `json:"regnum" example:"X123XX150"`
+	Mark   string `json:"mark" example:"Lada"`
+	Model  string `json:"model" example:"Vesta"`
+	Year   int    `json:"year" example:"2020"`
 	Owner  People `json:"owner"`
 }
 
 type People struct {
-	Name       string `json:"name"`
-	Surname    string `json:"surname"`
-	Patronymic string `json:"patronymic"`
+	Name       string `json:"name" example:"name"`
+	Surname    string `json:"surname" example:"surname"`
+	Patronymic string `json:"patronymic" example:"patronymic"`
 }
 
+type Cars struct {
+	Cars []Car
+}
+
+// CarQuery model info
+// @Description Car info information
+// @Description with Limit and Offset
 type QueryFilter struct {
-	Id     int    `json:"id"`
-	RegNum string `json:"regNum"`
-	Mark   string `json:"mark"`
-	Model  string `json:"model"`
-	Year   int    `json:"year"`
+	Id     int    `json:"id" example:"1"`
+	RegNum string `json:"regNum" example:"X123XX150"`
+	Mark   string `json:"mark" example:"Lada"`
+	Model  string `json:"model" example:"Vesta"`
+	Year   int    `json:"year" example:"2020"`
 	Owner  People `json:"owner"`
-	Offset int    `json:"offset"`
-	Limit  int    `json:"limit"`
+	Offset int    `json:"offset" example:"0"`
+	Limit  int    `json:"limit" example:"100"`
 }
 
+// RegNum model info
+// @Description regNum list
 type RegNums struct {
-	Nums []string `json:"regNums"`
+	Nums []string `json:"regNums" example:"X123XX150"`
 }

@@ -19,12 +19,12 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//@title CarInfo API
-//@version 1.0
-//description API server for CarInfo Application
-
-//@host localhost:8000
-//@basepath /
+// @Param mark query string true "mark"
+// @Param model query string true "model"
+// @Param year query int true "year"
+// @Param owner.name query string true "name"
+// @Param owner.surname query string true "surname"
+// @Param owner.patronymic query string true "patronymic"
 
 func main() {
 	Run()
