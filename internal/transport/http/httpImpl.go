@@ -36,16 +36,18 @@ func (a *apiImpl) StartHTTP() error {
 
 	router := gin.Default()
 
-	router.GET("/info/:id", a.GetCarHandler)    //get Car
-	router.GET("/info/", a.getCarsHandler)      //get Car
-	router.POST("/info/", a.addCarHandler)      //add Car
-	router.DELETE("/info/:id", a.delCarHandler) //del Car
-	router.PUT("/info/:id", a.updateCarHandler) //update Car
+	methods := router.Group("/info/")
 
-	router.GET("/info/get_carinfo", a.getCarInfoHandler) //get CarInfo
+	methods.GET(":id", a.GetCarHandler)    //get Car
+	methods.GET("", a.getCarsHandler)      //get Car
+	methods.POST("", a.addCarHandler)      //add Car
+	methods.DELETE(":id", a.delCarHandler) //del Car
+	methods.PUT(":id", a.updateCarHandler) //update Car
+
+	router.GET("/info/get_carinfo", a.getCarInfoHandler) // external data source emulator
 
 	URLSwagger := ginSwagger.URL("http://127.0.0.1:80/swagger/doc.json")
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, URLSwagger)) //*any
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, URLSwagger))
 
 	err := router.Run(fmt.Sprintf(":%s", a.cfg.HTTP.HostPort))
 	if err != nil {
@@ -61,6 +63,7 @@ func (a *apiImpl) Stop() {
 	}
 }
 
+// GetCarHandler godoc
 // @Summary get car info by id from the database
 // @Schemes
 // @Description  get car info by id from the database
@@ -97,6 +100,7 @@ func (a *apiImpl) GetCarHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, Car)
 }
 
+// GetCarsHandler godoc
 // @Summary get Cars info from the database
 // @Schemes
 // @Description get Cars info from the database with a search filter
@@ -180,6 +184,7 @@ func (a *apiImpl) getCarsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, Cars)
 }
 
+// addCarHandler godoc
 // @Summary add car info to to database
 // @Schemes
 // @Description add car info to database
@@ -225,6 +230,7 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, respCar)
 }
 
+// delCarHandler godoc
 // @Summary del car info from the database
 // @Schemes
 // @Description del car info from the database
@@ -261,6 +267,7 @@ func (a *apiImpl) delCarHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, Car)
 }
 
+// updateCarHandler godoc
 // @Summary update car info in the database
 // @Schemes
 // @Description update car info in the database
