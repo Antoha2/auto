@@ -96,7 +96,7 @@ func (a *apiImpl) GetCarHandler(c *gin.Context) {
 
 	if car.Id == 0 {
 		log.Info("get Car successfully", sl.Atr("respCar", car))
-		c.JSON(http.StatusBadRequest, "record with this id not found")
+		c.JSON(http.StatusNotFound, "record with this id not found")
 	} else {
 
 		log.Info("get Car successfully", sl.Atr("respCar", car))
