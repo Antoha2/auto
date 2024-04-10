@@ -27,6 +27,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "methods"
+                ],
                 "summary": "get Cars info from the database",
                 "parameters": [
                     {
@@ -98,6 +101,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "methods"
+                ],
                 "summary": "add car info to to database",
                 "parameters": [
                     {
@@ -144,6 +150,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "methods"
+                ],
                 "summary": "get car info by id from the database",
                 "parameters": [
                     {
@@ -182,6 +191,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "methods"
                 ],
                 "summary": "update car info in the database",
                 "parameters": [
@@ -223,6 +235,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "methods"
                 ],
                 "summary": "del car info from the database",
                 "parameters": [
@@ -329,7 +344,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/info/",
 	Schemes:          []string{},
 	Title:            "Car Info",
-	Description:      "",
+	Description:      "для получения данных из внешного источника необходимо изменить значение  переменной URL_GETCARINFO в .env",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

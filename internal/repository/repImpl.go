@@ -12,9 +12,21 @@ import (
 func (r *Rep) GetCar(ctx context.Context, id int) (*RepCar, error) {
 
 	car := new(RepCar)
+	count := 0
 
-	query := "SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars WHERE id = $1"
+	query := "SELECT count(id) FROM cars WHERE id = $1"
 	row := r.DB.QueryRowContext(ctx, query, id)
+	if err := row.Scan(&count); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("sql select Car failed, query: %s", query))
+	}
+
+	if count == 0 {
+		return car, nil
+	}
+
+	query = "SELECT id, regnum, mark, model, year, name, surname, patronymic FROM cars WHERE id = $1"
+	row = r.DB.QueryRowContext(ctx, query, id)
+
 	if err := row.Scan(&car.Id, &car.RegNum, &car.Mark, &car.Model, &car.Year, &car.Name, &car.Surname, &car.Patronymic); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("sql select Car failed, query: %s", query))
 	}
@@ -111,15 +123,10 @@ func (r *Rep) UpdateCar(ctx context.Context, car *RepCar) (*RepCar, error) {
 
 //build query string
 func buildQueryAddCarConstrain(cars []*RepCar) string { //, []any) {
-	//i := 1
-	//	args := make([]any, 0)
 	constrains := make([]string, 0, len(cars))
 	for _, car := range cars {
-		//	s := fmt.Sprintf("('$%d','$%d','$%d',$%d,'$%d','$%d','$%d')", i, i+1, i+2, i+3, i+4, i+5, i+6)
-		//	i = i + 7
 		s := fmt.Sprintf("('%s','%s','%s','%d','%s','%s','%s')", car.RegNum, car.Mark, car.Model, car.Year, car.Name, car.Surname, car.Patronymic)
 		constrains = append(constrains, s)
-		//args = append(args, car.RegNum, car.Mark, car.Model, car.Year, car.Name, car.Surname, car.Patronymic)
 	}
 
 	return strings.Join(constrains, ",") //, args

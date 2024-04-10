@@ -55,7 +55,6 @@ type RegNums struct {
 func (s *carInfoImpl) GetCarInfo(ctx context.Context, regNums []string) ([]*service.Car, error) {
 
 	nums := &RegNums{Nums: regNums}
-
 	payload, _ := json.Marshal(nums)
 
 	req, err := http.NewRequest("GET", s.URL, bytes.NewBuffer(payload))

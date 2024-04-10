@@ -30,20 +30,19 @@ import (
 // @BasePath  /info/
 // @host http://127.0.0.1:80
 
-// @Tags         API
+// @Description  для получения данных из внешного источника необходимо изменить значение  переменной URL_GETCARINFO в .env
 
 func (a *apiImpl) StartHTTP() error {
 
 	router := gin.Default()
-
 	methods := router.Group("/info/")
-
-	methods.GET(":id", a.GetCarHandler)    //get Car
-	methods.GET("", a.getCarsHandler)      //get Car
-	methods.POST("", a.addCarHandler)      //add Car
-	methods.DELETE(":id", a.delCarHandler) //del Car
-	methods.PUT(":id", a.updateCarHandler) //update Car
-
+	{
+		methods.GET(":id", a.GetCarHandler)    //get Car
+		methods.GET("", a.getCarsHandler)      //get Car
+		methods.POST("", a.addCarHandler)      //add Car
+		methods.DELETE(":id", a.delCarHandler) //del Car
+		methods.PUT(":id", a.updateCarHandler) //update Car
+	}
 	router.GET("/info/get_carinfo", a.getCarInfoHandler) // external data source emulator
 
 	URLSwagger := ginSwagger.URL("http://127.0.0.1:80/swagger/doc.json")
@@ -65,8 +64,8 @@ func (a *apiImpl) Stop() {
 
 // GetCarHandler godoc
 // @Summary get car info by id from the database
-// @Schemes
 // @Description  get car info by id from the database
+// @Tags         methods
 // @Accept json
 // @Produce json
 // @Param  id     query    int     true        "ID"
@@ -88,21 +87,26 @@ func (a *apiImpl) GetCarHandler(c *gin.Context) {
 
 	log.Info("run get Car by ID", sl.Atr("id", id))
 
-	Car, err := a.service.GetCar(c, id)
+	car, err := a.service.GetCar(c, id)
 	if err != nil {
 		a.log.Error("occurred error for GetCar", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("get Car successfully", sl.Atr("respCar", Car))
+	if car.Id == 0 {
+		log.Info("get Car successfully", sl.Atr("respCar", car))
+		c.JSON(http.StatusBadRequest, "record with this id not found")
+	} else {
 
-	c.JSON(http.StatusOK, Car)
+		log.Info("get Car successfully", sl.Atr("respCar", car))
+		c.JSON(http.StatusOK, car)
+	}
 }
 
 // GetCarsHandler godoc
 // @Summary get Cars info from the database
-// @Schemes
+// @Tags         methods
 // @Description get Cars info from the database with a search filter
 // @Accept json
 // @Produce json
@@ -186,12 +190,12 @@ func (a *apiImpl) getCarsHandler(c *gin.Context) {
 
 // addCarHandler godoc
 // @Summary add car info to to database
-// @Schemes
+// @Tags         methods
 // @Description add car info to database
 // @Accept json
 // @Produce json
 // @Param regNums body service.RegNums true "slice reg numbers"
-// @Success 200 {object} []service.Car "added records"
+// @Success 201 {object} []service.Car "added records"
 // @Failure 400  400  {object}  httputil.HTTPError
 // @Failure 500   500  {object}  httputil.HTTPError
 // @Router /info/ [post]
@@ -216,9 +220,7 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 	}
 
 	log.Info("run add Cars", sl.Atr("RegNums", nums))
-
 	respCar, err := a.service.AddCar(c, nums)
-
 	if err != nil {
 		a.log.Error("occurred error for run add Car", sl.Err(err))
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -232,7 +234,7 @@ func (a *apiImpl) addCarHandler(c *gin.Context) {
 
 // delCarHandler godoc
 // @Summary del car info from the database
-// @Schemes
+// @Tags         methods
 // @Description del car info from the database
 // @Accept json
 // @Produce json
@@ -269,12 +271,12 @@ func (a *apiImpl) delCarHandler(c *gin.Context) {
 
 // updateCarHandler godoc
 // @Summary update car info in the database
-// @Schemes
+// @Tags methods
 // @Description update car info in the database
 // @Accept json
 // @Produce json
 // @Param car body service.Car true "parameters of the record being updated"
-// @Success 200 {object} service.Car "updated record"
+// @Success 201 {object} service.Car "updated record"
 // @Failure 400  400  {object}  httputil.HTTPError
 // @Failure 500   500  {object}  httputil.HTTPError
 // @Router /info/:id [put]

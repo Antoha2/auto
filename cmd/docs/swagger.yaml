@@ -48,6 +48,8 @@ info:
   contact:
     email: 9112441775@mail.ru
     name: Lebedev A.S.
+  description: для получения данных из внешного источника необходимо изменить значение  переменной
+    URL_GETCARINFO в .env
   title: Car Info
   version: 0.0.1
 paths:
@@ -99,6 +101,8 @@ paths:
           schema:
             type: "500"
       summary: get Cars info from the database
+      tags:
+      - methods
     post:
       consumes:
       - application/json
@@ -128,6 +132,8 @@ paths:
           schema:
             type: "500"
       summary: add car info to to database
+      tags:
+      - methods
   /info/:id:
     delete:
       consumes:
@@ -155,6 +161,8 @@ paths:
           schema:
             type: "500"
       summary: del car info from the database
+      tags:
+      - methods
     get:
       consumes:
       - application/json
@@ -181,6 +189,8 @@ paths:
           schema:
             type: "500"
       summary: get car info by id from the database
+      tags:
+      - methods
     put:
       consumes:
       - application/json
@@ -208,4 +218,6 @@ paths:
           schema:
             type: "500"
       summary: update car info in the database
+      tags:
+      - methods
 swagger: "2.0"

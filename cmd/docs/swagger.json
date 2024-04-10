@@ -1,6 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
+        "description": "для получения данных из внешного источника необходимо изменить значение  переменной URL_GETCARINFO в .env",
         "title": "Car Info",
         "contact": {
             "name": "Lebedev A.S.",
@@ -19,6 +20,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "methods"
                 ],
                 "summary": "get Cars info from the database",
                 "parameters": [
@@ -91,6 +95,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "methods"
+                ],
                 "summary": "add car info to to database",
                 "parameters": [
                     {
@@ -137,6 +144,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "methods"
+                ],
                 "summary": "get car info by id from the database",
                 "parameters": [
                     {
@@ -175,6 +185,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "methods"
                 ],
                 "summary": "update car info in the database",
                 "parameters": [
@@ -216,6 +229,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "methods"
                 ],
                 "summary": "del car info from the database",
                 "parameters": [
